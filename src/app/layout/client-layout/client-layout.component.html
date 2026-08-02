@@ -1,6 +1,8 @@
-<div class="min-h-screen flex bg-bg">
+<div class="h-screen flex bg-bg overflow-hidden">
   <!-- Sidebar -->
-  <aside class="w-64 shrink-0 bg-surface border-r border-border flex flex-col p-6">
+  <aside
+    class="w-64 shrink-0 bg-surface border-r border-border flex flex-col p-6 h-screen overflow-y-auto"
+  >
     <div class="flex items-center gap-3 mb-10">
       <div class="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center">
         <span class="text-white font-(--font-display) text-lg">D</span>
@@ -15,7 +17,7 @@
       @for (item of navItems; track item.path) {
         <a
           [routerLink]="item.path"
-          routerLinkActive="bg-[var(--color-primary-light)] text-[var(--color-primary-dark)] font-semibold"
+          routerLinkActive="bg-primary-light text-primary-dark font-semibold"
           class="flex items-center gap-3 px-4 py-3 rounded-xl text-ink-soft hover:bg-primary-light hover:text-primary-dark transition-colors text-sm"
         >
           <svg
@@ -70,7 +72,7 @@
   </aside>
 
   <!-- Contenu principal -->
-  <main class="flex-1 overflow-y-auto">
+  <main class="flex-1 h-screen overflow-y-auto">
     <div class="max-w-6xl mx-auto p-8">
       <router-outlet />
     </div>
