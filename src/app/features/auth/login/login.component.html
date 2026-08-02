@@ -1,0 +1,128 @@
+<div class="min-h-screen flex">
+  <!-- Panneau gauche — identité de marque -->
+  <div class="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-primary">
+    <div
+      class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-primary-dark opacity-40 blur-3xl"
+    ></div>
+    <div
+      class="absolute bottom-0 right-0 w-md h-112 rounded-full bg-accent opacity-20 blur-3xl translate-x-1/3 translate-y-1/3"
+    ></div>
+
+    <div class="relative z-10 flex flex-col justify-between p-14 text-white">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-11 h-11 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center"
+        >
+          <svg lucideWallet class="w-6 h-6"></svg>
+        </div>
+        <span class="font-(--font-display) text-xl">Dakar-Tech Wallet</span>
+      </div>
+
+      <div class="max-w-md">
+        <p class="font-(--font-display) text-4xl leading-tight mb-4">
+          Votre argent, géré simplement et en toute confiance.
+        </p>
+        <p class="text-white/70 text-sm leading-relaxed">
+          Virements instantanés, suivi de prêts et un score de solvabilité qui évolue avec vous.
+        </p>
+      </div>
+
+      <p class="text-white/40 text-xs">© 2026 Dakar-Tech Wallet — École 221</p>
+    </div>
+  </div>
+
+  <!-- Panneau droit — formulaire -->
+  <div class="w-full lg:w-1/2 flex items-center justify-center bg-bg p-8">
+    <div class="w-full max-w-sm">
+      <div class="lg:hidden flex items-center gap-3 mb-10 justify-center">
+        <div class="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center">
+          <svg lucideWallet class="w-5 h-5 text-white"></svg>
+        </div>
+        <span class="font-(--font-display) text-lg text-ink">Dakar-Tech Wallet</span>
+      </div>
+
+      <h1 class="font-(--font-display) text-2xl text-ink mb-1">Bon retour</h1>
+      <p class="text-sm text-ink-soft mb-8">Connectez-vous pour accéder à votre portefeuille.</p>
+
+      @if (erreur()) {
+        <div class="mb-6 px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-danger text-sm">
+          {{ erreur() }}
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="soumettre()" class="space-y-5">
+        <div>
+          <label for="email" class="block text-sm font-medium text-ink mb-1.5">Email</label>
+          <div class="relative">
+            <svg
+              lucideMail
+              class="absolute inset-y-0 left-3.5 my-auto w-4.5 h-4.5 text-ink-soft"
+            ></svg>
+            <input
+              id="email"
+              type="email"
+              formControlName="email"
+              placeholder="vous@exemple.com"
+              class="w-full pl-11 pr-4 py-2.5 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+            />
+          </div>
+          @if (form.controls.email.invalid && form.controls.email.touched) {
+            <p class="mt-1.5 text-xs text-danger">Adresse email valide requise</p>
+          }
+        </div>
+
+        <div>
+          <label for="motDePasse" class="block text-sm font-medium text-ink mb-1.5"
+            >Mot de passe</label
+          >
+          <div class="relative">
+            <input
+              id="motDePasse"
+              [type]="afficherMotDePasse() ? 'text' : 'password'"
+              formControlName="motDePasse"
+              placeholder="••••••••"
+              class="w-full px-4 py-2.5 pr-11 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+            />
+            <button
+              type="button"
+              (click)="basculerAffichageMotDePasse()"
+              class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-ink-soft hover:text-ink transition-colors"
+              [attr.aria-label]="
+                afficherMotDePasse() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'
+              "
+            >
+              @if (afficherMotDePasse()) {
+                <svg lucideEyeOff class="w-4.5 h-4.5"></svg>
+              } @else {
+                <svg lucideEye class="w-4.5 h-4.5"></svg>
+              }
+            </button>
+          </div>
+          @if (form.controls.motDePasse.invalid && form.controls.motDePasse.touched) {
+            <p class="mt-1.5 text-xs text-danger">Mot de passe requis</p>
+          }
+        </div>
+
+        <button
+          type="submit"
+          [disabled]="chargement()"
+          class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-dark disabled:opacity-60 transition-colors"
+        >
+          @if (chargement()) {
+            <svg lucideLoaderCircle class="w-4 h-4 animate-spin"></svg>
+            Connexion...
+          } @else {
+            Se connecter
+          }
+        </button>
+      </form>
+
+      <p class="mt-8 text-center text-sm text-ink-soft">
+        Pas encore de compte ?
+        <a routerLink="/register" class="text-primary font-medium hover:underline"
+          >Créer un compte</a
+        >
+      </p>
+    </div>
+  </div>
+</div>

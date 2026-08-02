@@ -1,3 +1,31 @@
-/* You can add global styles to this file, and also import other style files */
+@import "tailwindcss";
+@theme {
+  --color-bg: #F6F7F4;
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #FBFAF8;
 
-@import 'tailwindcss';
+  --color-primary: #2F6F62;
+  --color-primary-dark: #234F45;
+  --color-primary-light: #E4EEEA;
+
+  --color-accent: #D9A441;
+  --color-accent-light: #F6EAD2;
+
+  --color-success: #5B8C5A;
+  --color-warning: #C97B4A;
+  --color-danger: #B8564F;
+
+  --color-ink: #26312E;
+  --color-ink-soft: #5B6B65;
+  --color-border: #E4E7E2;
+
+  --font-display: 'Fraunces', serif;
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
