@@ -1,0 +1,95 @@
+<div class="max-w-lg mx-auto space-y-6">
+  <a
+    routerLink="/client/prets"
+    class="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-ink transition-colors"
+  >
+    <svg lucideArrowLeft class="w-4 h-4"></svg>
+    Retour aux prêts
+  </a>
+
+  <div>
+    <h1 class="font-(--font-display) text-2xl sm:text-3xl text-ink">Nouvelle demande de prêt</h1>
+    <p class="text-sm text-ink-soft mt-1">Remplissez les informations ci-dessous</p>
+  </div>
+
+  @if (erreur()) {
+    <div class="px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-danger text-sm">
+      {{ erreur() }}
+    </div>
+  }
+
+  <form
+    [formGroup]="form"
+    (ngSubmit)="soumettre()"
+    class="bg-surface rounded-2xl border border-border p-6 space-y-5"
+  >
+    <div>
+      <label for="montant" class="block text-sm font-medium text-ink mb-1.5"
+        >Montant souhaité (FCFA)</label
+      >
+      <input
+        id="montant"
+        type="number"
+        formControlName="montant"
+        placeholder="500000"
+        class="w-full px-4 py-2.5 rounded-xl border border-border bg-bg text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+      />
+      @if (form.controls.montant.invalid && form.controls.montant.touched) {
+        <p class="mt-1.5 text-xs text-danger">Montant minimum : 1 000 FCFA</p>
+      }
+    </div>
+
+    <div>
+      <label for="motif" class="block text-sm font-medium text-ink mb-1.5">Motif du prêt</label>
+      <input
+        id="motif"
+        type="text"
+        formControlName="motif"
+        placeholder="Achat de matériel, études..."
+        class="w-full px-4 py-2.5 rounded-xl border border-border bg-bg text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+      />
+      @if (form.controls.motif.invalid && form.controls.motif.touched) {
+        <p class="mt-1.5 text-xs text-danger">Motif requis (3 caractères minimum)</p>
+      }
+    </div>
+
+    <div>
+      <label for="dureeEnMois" class="block text-sm font-medium text-ink mb-1.5"
+        >Durée de remboursement (mois)</label
+      >
+      <input
+        id="dureeEnMois"
+        type="number"
+        formControlName="dureeEnMois"
+        placeholder="12"
+        class="w-full px-4 py-2.5 rounded-xl border border-border bg-bg text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+      />
+      @if (form.controls.dureeEnMois.invalid && form.controls.dureeEnMois.touched) {
+        <p class="mt-1.5 text-xs text-danger">Entre 1 et 60 mois</p>
+      }
+    </div>
+
+    <!-- Estimation en temps réel -->
+    @if (mensualiteEstimee(); as mensualite) {
+      <div class="flex items-center justify-between px-4 py-3 rounded-xl bg-primary-light">
+        <span class="text-sm text-primary-dark font-medium">Mensualité estimée</span>
+        <span class="text-sm font-mono font-semibold text-primary-dark tabular-nums"
+          >{{ mensualite | fcfa }} FCFA</span
+        >
+      </div>
+    }
+
+    <button
+      type="submit"
+      [disabled]="chargement()"
+      class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-dark disabled:opacity-60 transition-colors"
+    >
+      @if (chargement()) {
+        <svg lucideLoaderCircle class="w-4 h-4 animate-spin"></svg>
+        Envoi...
+      } @else {
+        Soumettre la demande
+      }
+    </button>
+  </form>
+</div>

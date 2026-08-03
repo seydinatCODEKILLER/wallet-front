@@ -1,0 +1,161 @@
+<div class="max-w-2xl mx-auto space-y-6">
+  <a
+    routerLink="/client/prets"
+    class="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-ink transition-colors"
+  >
+    <svg lucideArrowLeft class="w-4 h-4"></svg>
+    Retour aux prêts
+  </a>
+
+  @if (chargement()) {
+    <div class="space-y-4">
+      <div class="h-40 rounded-2xl bg-surface border border-border animate-pulse"></div>
+      <div class="h-64 rounded-2xl bg-surface border border-border animate-pulse"></div>
+    </div>
+  } @else if (pret(); as p) {
+    @if (erreur()) {
+      <div class="px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-danger text-sm">
+        {{ erreur() }}
+      </div>
+    }
+
+    <!-- Résumé du prêt -->
+    <div class="bg-surface rounded-2xl border border-border p-6">
+      <div class="flex items-start justify-between gap-3 mb-5">
+        <div>
+          <p class="text-sm text-ink-soft">{{ p.motif }}</p>
+          <p class="font-(--font-display) text-3xl text-ink mt-1 tabular-nums">
+            {{ p.montant | fcfa }}
+            <span class="text-lg text-ink-soft font-sans font-normal">FCFA</span>
+          </p>
+        </div>
+        <app-badge-statut [statut]="p.statut" />
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <p class="text-ink-soft text-xs mb-1">Durée</p>
+          <p class="font-medium text-ink">{{ p.dureeEnMois }} mois</p>
+        </div>
+        <div>
+          <p class="text-ink-soft text-xs mb-1">Demandé le</p>
+          <p class="font-medium text-ink">{{ p.dateCreation | date: 'd MMM yyyy' }}</p>
+        </div>
+        @if (p.statut === 'VALIDE' || p.statut === 'SOLDE') {
+          <div>
+            <p class="text-ink-soft text-xs mb-1">Reste à payer</p>
+            <p class="font-mono font-semibold text-ink tabular-nums">
+              {{ p.montantRestant | fcfa }} FCFA
+            </p>
+          </div>
+          <div>
+            <p class="text-ink-soft text-xs mb-1">Validé le</p>
+            <p class="font-medium text-ink">{{ p.dateValidation | date: 'd MMM yyyy' }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Remboursement total -->
+      @if (p.statut === 'VALIDE' && p.montantRestant > 0) {
+        @if (!confirmationTotalOuverte()) {
+          <button
+            (click)="confirmationTotalOuverte.set(true)"
+            class="w-full mt-6 flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-primary text-primary-dark font-medium text-sm hover:bg-primary-light transition-colors"
+          >
+            <svg lucideWallet class="w-4 h-4"></svg>
+            Rembourser le solde restant en une fois
+          </button>
+        } @else {
+          <div class="mt-6 p-4 rounded-xl bg-accent-light space-y-3">
+            <p class="text-sm text-ink">
+              Confirmer le remboursement de
+              <strong class="font-mono">{{ p.montantRestant | fcfa }} FCFA</strong> ?
+            </p>
+            <div class="flex gap-3">
+              <button
+                (click)="confirmationTotalOuverte.set(false)"
+                class="flex-1 py-2.5 rounded-xl border border-border bg-surface text-ink text-sm font-medium hover:bg-bg transition-colors"
+              >
+                Annuler
+              </button>
+              <button
+                (click)="rembourserTotal()"
+                [disabled]="remboursementTotalEnCours()"
+                class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-dark disabled:opacity-60 transition-colors"
+              >
+                @if (remboursementTotalEnCours()) {
+                  <svg lucideLoaderCircle class="w-4 h-4 animate-spin"></svg>
+                } @else {
+                  Confirmer
+                }
+              </button>
+            </div>
+          </div>
+        }
+      }
+    </div>
+
+    <!-- Échéancier -->
+    @if (p.mensualites.length > 0) {
+      <div class="bg-surface rounded-2xl border border-border overflow-hidden">
+        <div class="p-6 pb-4">
+          <h2 class="font-semibold text-ink">Échéancier</h2>
+        </div>
+
+        <div class="divide-y divide-border">
+          @for (mensualite of p.mensualites; track mensualite.id) {
+            <div class="flex items-center gap-4 px-6 py-4">
+              <div
+                class="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-xs font-semibold"
+                [class.bg-primary-light]="mensualite.statut === 'PAYE'"
+                [class.text-primary-dark]="mensualite.statut === 'PAYE'"
+                [class.bg-bg]="mensualite.statut !== 'PAYE'"
+                [class.text-ink-soft]="mensualite.statut !== 'PAYE'"
+              >
+                @if (mensualite.statut === 'PAYE') {
+                  <svg lucideCheck class="w-4 h-4"></svg>
+                } @else {
+                  {{ mensualite.numeroEcheance }}
+                }
+              </div>
+
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2">
+                  <p class="text-sm font-medium text-ink">
+                    Échéance {{ mensualite.numeroEcheance }}
+                  </p>
+                  <app-badge-statut [statut]="mensualite.statut" />
+                </div>
+                <p class="text-xs text-ink-soft mt-0.5">
+                  @if (mensualite.statut === 'PAYE') {
+                    Payée le {{ mensualite.datePaiement | date: 'd MMM yyyy' }}
+                  } @else {
+                    Échéance le {{ mensualite.dateEcheance | date: 'd MMM yyyy' }}
+                  }
+                </p>
+              </div>
+
+              <p class="text-sm font-mono font-semibold text-ink tabular-nums shrink-0">
+                {{ mensualite.montant | fcfa }} FCFA
+              </p>
+
+              @if (mensualite.statut !== 'PAYE') {
+                <button
+                  (click)="rembourserMensualite(mensualite)"
+                  [disabled]="mensualiteEnCours() === mensualite.id"
+                  class="shrink-0 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-white text-xs font-medium hover:bg-primary-dark disabled:opacity-60 transition-colors"
+                >
+                  @if (mensualiteEnCours() === mensualite.id) {
+                    <svg lucideLoaderCircle class="w-3.5 h-3.5 animate-spin"></svg>
+                  } @else {
+                    Payer
+                  }
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>
