@@ -1,24 +1,42 @@
-<div class="min-h-screen flex bg-bg">
-  <aside class="w-64 shrink-0 bg-ink flex flex-col p-6">
-    <div class="flex items-center gap-3 mb-10">
-      <div class="w-10 h-10 rounded-2xl bg-accent flex items-center justify-center">
-        <span class="text-ink font-(--font-display) text-lg"
-          >D</span
-        >
+<div class="h-screen flex bg-bg overflow-hidden">
+  <!-- Overlay mobile -->
+  @if (menuOuvert()) {
+    <div
+      (click)="basculerMenu()"
+      class="fixed inset-0 bg-ink/60 backdrop-blur-sm z-30 lg:hidden"
+    ></div>
+  }
+
+  <!-- Sidebar : drawer sur mobile, fixe sur desktop -->
+  <aside
+    class="fixed lg:static inset-y-0 left-0 z-40 w-72 lg:w-64 shrink-0 bg-ink flex flex-col p-6 h-screen overflow-y-auto transition-transform duration-300 ease-out lg:translate-x-0"
+    [class.translate-x-0]="menuOuvert()"
+    [class.-translate-x-full]="!menuOuvert()"
+  >
+    <div class="flex items-center justify-between mb-10">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-accent flex items-center justify-center">
+          <span class="text-ink font-(--font-display) text-lg">D</span>
+        </div>
+        <div>
+          <p class="font-(--font-display) text-lg text-white leading-none">Dakar-Tech</p>
+          <p class="text-xs text-white/50 mt-0.5">Administration</p>
+        </div>
       </div>
-      <div>
-        <p class="font-(--font-display) text-lg text-white leading-none">
-          Dakar-Tech
-        </p>
-        <p class="text-xs text-white/50 mt-0.5">Administration</p>
-      </div>
+
+      <button
+        (click)="basculerMenu()"
+        class="lg:hidden text-white/70 hover:text-white transition-colors"
+      >
+        <svg lucideX class="w-5 h-5"></svg>
+      </button>
     </div>
 
     <nav class="flex-1 space-y-1">
       @for (item of navItems; track item.path) {
         <a
           [routerLink]="item.path"
-          routerLinkActive="bg-white/10 text-[var(--color-accent)] font-semibold"
+          routerLinkActive="bg-white/10 text-accent font-semibold"
           class="flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-white transition-colors text-sm"
         >
           <svg
@@ -72,9 +90,29 @@
     </div>
   </aside>
 
-  <main class="flex-1 overflow-y-auto">
-    <div class="max-w-6xl mx-auto p-8">
-      <router-outlet />
-    </div>
-  </main>
+  <!-- Colonne principale -->
+  <div class="flex-1 flex flex-col h-screen overflow-hidden">
+    <!-- Topbar mobile uniquement -->
+    <header
+      class="lg:hidden flex items-center justify-between px-5 py-4 bg-ink border-b border-white/10 shrink-0"
+    >
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-accent flex items-center justify-center">
+          <span class="text-ink font-(--font-display) text-sm">D</span>
+        </div>
+        <span class="font-(--font-display) text-base text-white">Dakar-Tech</span>
+      </div>
+
+      <button (click)="basculerMenu()" class="text-white/80 hover:text-white transition-colors">
+        <svg lucideMenu class="w-6 h-6"></svg>
+      </button>
+    </header>
+
+    <!-- Contenu -->
+    <main class="flex-1 overflow-y-auto">
+      <div class="max-w-6xl mx-auto p-5 sm:p-8">
+        <router-outlet />
+      </div>
+    </main>
+  </div>
 </div>

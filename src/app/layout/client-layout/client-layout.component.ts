@@ -1,15 +1,19 @@
-import { Component, inject } from '@angular/core';
-import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import { RouterOutlet, RouterLink, RouterLinkActive, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs';
+import { LucideMenu, LucideX } from '@lucide/angular';
 import { AuthStore } from '../../core/state/auth.store';
 
 @Component({
   selector: 'app-client-layout',
-  imports: [RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, LucideMenu, LucideX],
   templateUrl: './client-layout.component.html',
 })
 export class ClientLayoutComponent {
   protected readonly authStore = inject(AuthStore);
   private readonly router = inject(Router);
+
+  protected readonly menuOuvert = signal(false);
 
   protected readonly navItems = [
     {
@@ -33,6 +37,16 @@ export class ClientLayoutComponent {
       icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
     },
   ];
+
+  constructor() {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe(() => this.menuOuvert.set(false));
+  }
+
+  basculerMenu(): void {
+    this.menuOuvert.update((v) => !v);
+  }
 
   deconnexion(): void {
     this.authStore.deconnexion();

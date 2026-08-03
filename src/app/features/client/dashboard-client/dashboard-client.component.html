@@ -1,127 +1,193 @@
-<div class="space-y-8">
+<div class="space-y-6 sm:space-y-8">
   <!-- En-tête -->
-  <div>
-    <p class="text-sm text-ink-soft">Bonjour,</p>
-    <h1 class="font-(--font-display) text-3xl text-ink">
-      {{ authStore.utilisateur()?.prenom }} 👋
-    </h1>
+  <div class="flex items-end justify-between gap-3">
+    <div class="min-w-0">
+      <p class="text-sm text-ink-soft">Bonjour,</p>
+      <h1 class="font-(--font-display) text-2xl sm:text-3xl text-ink truncate">
+        {{ authStore.utilisateur()?.prenom }} 👋
+      </h1>
+    </div>
+    <div
+      class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary-light shrink-0"
+    >
+      <span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+      <span class="text-xs font-medium text-primary-dark">Compte actif</span>
+    </div>
   </div>
 
-  <!-- Carte de solde — signature visuelle -->
-  <div class="relative overflow-hidden rounded-3xl bg-primary p-8">
+  <!-- Carte de solde -->
+  <div class="relative overflow-hidden rounded-3xl bg-primary p-6 sm:p-10">
     <div
-      class="absolute -top-16 -right-10 w-64 h-64 rounded-full bg-primary-dark opacity-40 blur-3xl"
+      class="absolute -top-20 -right-16 w-56 h-56 sm:w-72 sm:h-72 rounded-full bg-primary-dark opacity-40 blur-3xl"
     ></div>
     <div
-      class="absolute bottom-0 left-1/3 w-72 h-72 rounded-full bg-accent opacity-20 blur-3xl translate-y-1/2"
+      class="absolute bottom-0 left-1/4 w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-accent opacity-20 blur-3xl translate-y-1/2"
     ></div>
+    <svg
+      class="absolute inset-0 w-full h-full opacity-[0.07]"
+      viewBox="0 0 400 200"
+      preserveAspectRatio="none"
+    >
+      <path
+        d="M0,120 C80,180 160,60 240,100 C320,140 360,80 400,110 L400,200 L0,200 Z"
+        fill="white"
+      />
+    </svg>
 
     <div class="relative z-10">
-      <div class="flex items-center justify-between mb-6">
-        <p class="text-white/70 text-sm">Solde disponible</p>
+      <div class="flex items-center justify-between mb-6 sm:mb-8">
+        <p class="text-white/60 text-xs sm:text-sm font-medium tracking-wide uppercase">
+          Solde disponible
+        </p>
         <button
           (click)="basculerVisibiliteSolde()"
-          class="text-white/70 hover:text-white transition-colors"
+          class="w-9 h-9 rounded-full flex items-center justify-center text-white/70 hover:text-white hover:bg-white/10 transition-colors shrink-0"
         >
           @if (soldeVisible()) {
-            <svg lucideEye class="w-5 h-5"></svg>
+            <svg lucideEye class="w-4.5 h-4.5"></svg>
           } @else {
-            <svg lucideEyeOff class="w-5 h-5"></svg>
+            <svg lucideEyeOff class="w-4.5 h-4.5"></svg>
           }
         </button>
       </div>
 
-      <p class="font-(--font-display) text-5xl text-white mb-1">
+      <p
+        class="font-(--font-display) text-3xl xs:text-4xl sm:text-6xl text-white mb-6 sm:mb-8 tabular-nums break-all leading-tight"
+      >
         @if (soldeVisible()) {
-          {{ compteStore.compte()?.solde ?? 0 | currency: 'XOF' : 'symbol' : '1.0-0' }}
+          {{ compteStore.compte()?.solde ?? 0 | fcfa }}
+          <span class="text-lg sm:text-2xl text-white/60 font-sans font-normal">FCFA</span>
         } @else {
-          •••••••
+          •••••••••
         }
       </p>
 
-      <p class="text-white/50 text-sm font-mono tracking-wide">
-        {{ compteStore.compte()?.numeroCompte ?? '—' }}
-      </p>
+      <button
+        (click)="copierNumeroCompte()"
+        class="inline-flex items-center gap-2 sm:gap-2.5 px-3 sm:px-4 py-2 rounded-full bg-white/10 hover:bg-white/15 transition-colors group max-w-full"
+      >
+        <span class="text-white/70 text-[11px] sm:text-xs font-mono tracking-wider truncate">
+          {{ compteStore.compte()?.numeroCompte ?? '—' }}
+        </span>
+        @if (numeroCopie()) {
+          <svg lucideCheck class="w-3.5 h-3.5 text-white shrink-0"></svg>
+        } @else {
+          <svg
+            lucideCopy
+            class="w-3.5 h-3.5 text-white/50 group-hover:text-white/80 transition-colors shrink-0"
+          ></svg>
+        }
+      </button>
     </div>
   </div>
 
   <!-- Actions rapides -->
-  <div class="grid grid-cols-2 gap-4">
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
     <a
       routerLink="/client/virement"
-      class="flex items-center gap-4 p-5 rounded-2xl bg-surface border border-border hover:border-primary/40 hover:shadow-sm transition-all"
+      class="group flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-surface border border-border hover:border-primary/40 hover:shadow-md hover:shadow-primary/5 hover:-translate-y-0.5 transition-all duration-200"
     >
-      <div class="w-11 h-11 rounded-xl bg-primary-light flex items-center justify-center shrink-0">
+      <div
+        class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-primary-light flex items-center justify-center shrink-0"
+      >
         <svg lucideArrowLeftRight class="w-5 h-5 text-primary-dark"></svg>
       </div>
-      <div>
+      <div class="flex-1 min-w-0">
         <p class="font-semibold text-ink text-sm">Faire un virement</p>
-        <p class="text-xs text-ink-soft">Vers un autre client</p>
+        <p class="text-xs text-ink-soft mt-0.5">Vers un autre client</p>
       </div>
+      <svg
+        lucideArrowUpRight
+        class="w-4 h-4 text-ink-soft/0 group-hover:text-primary transition-colors shrink-0"
+      ></svg>
     </a>
 
     <a
       routerLink="/client/prets/nouvelle-demande"
-      class="flex items-center gap-4 p-5 rounded-2xl bg-surface border border-border hover:border-primary/40 hover:shadow-sm transition-all"
+      class="group flex items-center gap-4 p-4 sm:p-5 rounded-2xl bg-surface border border-border hover:border-accent/40 hover:shadow-md hover:shadow-accent/5 hover:-translate-y-0.5 transition-all duration-200"
     >
-      <div class="w-11 h-11 rounded-xl bg-accent-light flex items-center justify-center shrink-0">
+      <div
+        class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-accent-light flex items-center justify-center shrink-0"
+      >
         <svg lucideLandmark class="w-5 h-5 text-accent"></svg>
       </div>
-      <div>
+      <div class="flex-1 min-w-0">
         <p class="font-semibold text-ink text-sm">Demander un prêt</p>
-        <p class="text-xs text-ink-soft">Simple et rapide</p>
+        <p class="text-xs text-ink-soft mt-0.5">Simple et rapide</p>
       </div>
+      <svg
+        lucideArrowUpRight
+        class="w-4 h-4 text-ink-soft/0 group-hover:text-accent transition-colors shrink-0"
+      ></svg>
     </a>
   </div>
 
   <!-- Transactions récentes -->
-  <div class="bg-surface rounded-2xl border border-border">
-    <div class="flex items-center justify-between p-6 pb-4">
-      <h2 class="font-semibold text-ink">Transactions récentes</h2>
-      <a routerLink="/client/historique" class="text-sm text-primary font-medium hover:underline"
-        >Tout voir</a
+  <div class="bg-surface rounded-2xl border border-border overflow-hidden">
+    <div
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-5 sm:p-6 pb-3 sm:pb-4"
+    >
+      <h2 class="font-semibold text-ink text-[15px] sm:text-base whitespace-nowrap">
+        Transactions récentes
+      </h2>
+      <a
+        routerLink="/client/historique"
+        class="text-sm text-primary font-medium hover:underline flex items-center gap-1 shrink-0 self-start sm:self-auto"
       >
+        Tout voir
+        <svg lucideArrowUpRight class="w-3.5 h-3.5"></svg>
+      </a>
     </div>
 
     @if (chargement()) {
-      <div class="px-6 pb-6 space-y-3">
+      <div class="px-5 sm:px-6 pb-6 space-y-3">
         @for (i of [1, 2, 3]; track i) {
-          <div class="h-14 rounded-xl bg-bg animate-pulse"></div>
+          <div class="h-16 rounded-xl bg-bg animate-pulse"></div>
         }
       </div>
     } @else if (transactionsRecentes().length === 0) {
-      <p class="px-6 pb-6 text-sm text-ink-soft">Aucune transaction pour le moment.</p>
+      <div class="flex flex-col items-center justify-center py-14 px-6 text-center">
+        <div class="w-14 h-14 rounded-2xl bg-bg flex items-center justify-center mb-4">
+          <svg lucideInbox class="w-6 h-6 text-ink-soft"></svg>
+        </div>
+        <p class="text-sm font-medium text-ink">Aucune transaction pour le moment</p>
+        <p class="text-xs text-ink-soft mt-1">Vos virements et remboursements apparaîtront ici.</p>
+      </div>
     } @else {
       <div class="divide-y divide-border">
         @for (transaction of transactionsRecentes(); track transaction.id) {
-          <div class="flex items-center gap-4 px-6 py-4">
+          <div
+            class="flex items-center gap-3 sm:gap-4 px-5 sm:px-6 py-4 hover:bg-bg/60 transition-colors"
+          >
             <div
-              class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+              class="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shrink-0"
               [class.bg-primary-light]="transaction.sens === 'ENTREE'"
               [class.bg-red-50]="transaction.sens === 'SORTIE'"
             >
               @if (transaction.sens === 'ENTREE') {
-                <svg lucideArrowDownLeft class="w-4 h-4 text-primary-dark"></svg>
+                <svg lucideArrowDownLeft class="w-4 h-4 sm:w-4.5 sm:h-4.5 text-primary-dark"></svg>
               } @else {
-                <svg lucideArrowUpRight class="w-4 h-4 text-danger"></svg>
+                <svg lucideArrowUpRight class="w-4 h-4 sm:w-4.5 sm:h-4.5 text-danger"></svg>
               }
             </div>
 
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium text-ink truncate">{{ transaction.description }}</p>
-              <p class="text-xs text-ink-soft">
-                {{ transaction.dateTransaction | date: 'd MMM yyyy, HH:mm' }}
+              <p class="text-xs text-ink-soft mt-0.5">
+                {{ transaction.dateTransaction | date: 'd MMM, HH:mm' }}
               </p>
             </div>
 
-            <p
-              class="text-sm font-mono font-semibold shrink-0"
-              [class.text-primary-dark]="transaction.sens === 'ENTREE'"
-              [class.text-danger]="transaction.sens === 'SORTIE'"
-            >
-              {{ transaction.sens === 'ENTREE' ? '+' : '-'
-              }}{{ transaction.montant | currency: 'XOF' : 'symbol' : '1.0-0' }}
-            </p>
+            <div class="text-right shrink-0">
+              <p
+                class="text-sm font-mono font-semibold tabular-nums"
+                [class.text-primary-dark]="transaction.sens === 'ENTREE'"
+                [class.text-danger]="transaction.sens === 'SORTIE'"
+              >
+                {{ transaction.sens === 'ENTREE' ? '+' : '-' }}{{ transaction.montant | fcfa }}
+              </p>
+              <p class="text-[10px] text-ink-soft font-mono">FCFA</p>
+            </div>
           </div>
         }
       </div>
