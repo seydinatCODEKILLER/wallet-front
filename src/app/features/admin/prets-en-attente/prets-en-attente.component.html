@@ -1,0 +1,119 @@
+<div class="space-y-6 sm:space-y-8">
+  <!-- En-tête -->
+  <div>
+    <h1 class="font-(--font-display) text-2xl sm:text-3xl text-ink">Demandes de prêt en attente</h1>
+    <p class="text-sm text-ink-soft mt-1">
+      Validez ou rejetez les demandes en vous basant sur le score de solvabilité du client.
+    </p>
+  </div>
+
+  @if (erreur()) {
+    <div class="px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-danger text-sm">
+      {{ erreur() }}
+    </div>
+  }
+
+  @if (chargement()) {
+    <div class="space-y-4">
+      @for (i of [1, 2, 3]; track i) {
+        <div class="h-40 rounded-2xl bg-surface border border-border animate-pulse"></div>
+      }
+    </div>
+  } @else if (demandes().length === 0) {
+    <div
+      class="bg-surface rounded-2xl border border-border flex flex-col items-center justify-center py-16 px-6 text-center"
+    >
+      <div class="w-14 h-14 rounded-2xl bg-primary-light flex items-center justify-center mb-4">
+        <svg lucideLandmark class="w-6 h-6 text-primary-dark"></svg>
+      </div>
+      <p class="text-sm font-medium text-ink">Aucune demande en attente</p>
+      <p class="text-xs text-ink-soft mt-1">Toutes les demandes de prêt ont été traitées.</p>
+    </div>
+  } @else {
+    <!-- Liste des demandes -->
+    <div class="space-y-4">
+      @for (pret of demandes(); track pret.id) {
+        <div class="bg-surface rounded-2xl border border-border p-5 sm:p-6">
+          <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-5">
+            <!-- Infos client et prêt -->
+            <div class="flex items-start gap-4">
+              <div
+                class="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center shrink-0"
+              >
+                <svg lucideLandmark class="w-5 h-5 text-primary-dark"></svg>
+              </div>
+              <div>
+                <p class="font-semibold text-ink text-base">{{ pret.nomClient }}</p>
+                <p class="text-sm text-ink-soft mt-0.5">
+                  Demandé le {{ pret.dateCreation | date: 'd MMM yyyy' }}
+                </p>
+                <p class="text-sm text-ink mt-2">
+                  <span class="text-ink-soft">Motif : </span>{{ pret.motif }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Score de solvabilité -->
+            <div
+              class="flex items-center gap-2 px-3 py-2 rounded-xl border border-border bg-bg shrink-0"
+            >
+              <svg lucideShieldCheck class="w-5 h-5 text-ink-soft"></svg>
+              <div>
+                <p class="text-[10px] uppercase tracking-wide text-ink-soft font-medium">Score</p>
+                <span
+                  class="text-xs font-semibold px-2 py-0.5 rounded-full inline-block mt-0.5"
+                  [class]="couleurScore(pret.scoreSolvabiliteClient)"
+                >
+                  {{ pret.scoreSolvabiliteClient }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Détails financiers -->
+          <div class="grid grid-cols-2 gap-4 mb-6 pt-4 border-t border-border">
+            <div>
+              <p class="text-xs text-ink-soft mb-1">Montant demandé</p>
+              <p class="font-mono font-semibold text-ink tabular-nums">
+                {{ pret.montant | fcfa }} <span class="text-xs text-ink-soft font-sans">FCFA</span>
+              </p>
+            </div>
+            <div>
+              <p class="text-xs text-ink-soft mb-1">Durée demandée</p>
+              <p class="font-medium text-ink">{{ pret.dureeEnMois }} mois</p>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button
+              (click)="rejeter(pret)"
+              [disabled]="actionEnCours()?.id === pret.id"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-border bg-surface text-danger text-sm font-medium hover:bg-red-50 disabled:opacity-60 transition-colors"
+            >
+              @if (actionEnCours()?.id === pret.id && actionEnCours()?.type === 'rejeter') {
+                <svg lucideLoaderCircle class="w-4 h-4 animate-spin"></svg>
+              } @else {
+                <svg lucideX class="w-4 h-4"></svg>
+              }
+              Rejeter
+            </button>
+
+            <button
+              (click)="valider(pret)"
+              [disabled]="actionEnCours()?.id === pret.id"
+              class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-dark disabled:opacity-60 transition-colors"
+            >
+              @if (actionEnCours()?.id === pret.id && actionEnCours()?.type === 'valider') {
+                <svg lucideLoaderCircle class="w-4 h-4 animate-spin"></svg>
+              } @else {
+                <svg lucideCheck class="w-4 h-4"></svg>
+              }
+              Valider le prêt
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

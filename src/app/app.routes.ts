@@ -76,30 +76,34 @@ export const routes: Routes = [
   },
 
   //   // --- Espace Admin ---
-  //   {
-  //     path: 'admin',
-  //     canActivate: [adminGuard],
-  //     loadComponent: () =>
-  //       import('./layout/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
-  //     children: [
-  //       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
-  //       {
-  //         path: 'dashboard',
-  //         loadComponent: () =>
-  //           import('./features/admin/dashboard-admin/dashboard-admin.component').then(m => m.DashboardAdminComponent)
-  //       },
-  //       {
-  //         path: 'utilisateurs',
-  //         loadComponent: () =>
-  //           import('./features/admin/utilisateurs/utilisateurs.component').then(m => m.UtilisateursComponent)
-  //       },
-  //       {
-  //         path: 'prets-en-attente',
-  //         loadComponent: () =>
-  //           import('./features/admin/prets-en-attente/prets-en-attente.component').then(m => m.PretsEnAttenteComponent)
-  //       }
-  //     ]
-  //   },
+  {
+    path: 'admin',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./layout/admin-layout/admin-layout.component').then((m) => m.AdminLayoutComponent),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/admin/dashboard-admin/dashboard-admin.component').then(
+            (m) => m.DashboardAdminComponent,
+          ),
+      },
+      // {
+      //   path: 'utilisateurs',
+      //   loadComponent: () =>
+      //     import('./features/admin/utilisateurs/utilisateurs.component').then(m => m.UtilisateursComponent)
+      // },
+      {
+        path: 'prets-en-attente',
+        loadComponent: () =>
+          import('./features/admin/prets-en-attente/prets-en-attente.component').then(
+            (m) => m.PretsEnAttenteComponent,
+          ),
+      },
+    ],
+  },
 
   //   // --- Erreurs ---
   //   {

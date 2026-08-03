@@ -1,0 +1,62 @@
+<div class="space-y-6 sm:space-y-8">
+  <!-- En-tête -->
+  <div>
+    <h1 class="font-(--font-display) text-2xl sm:text-3xl text-ink">Tableau de bord</h1>
+    <p class="text-sm text-ink-soft mt-1">Vue d'ensemble de l'activité de la plateforme.</p>
+  </div>
+
+  @if (chargement()) {
+    <div class="flex items-center justify-center py-20">
+      <svg lucideLoaderCircle class="w-8 h-8 text-primary animate-spin"></svg>
+    </div>
+  } @else if (erreur()) {
+    <div class="px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-danger text-sm">
+      {{ erreur() }}
+    </div>
+  } @else if (stats(); as s) {
+    <!-- Cartes de statistiques -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+      <!-- Utilisateurs actifs -->
+      <div class="bg-surface rounded-2xl border border-border p-6 flex items-center gap-4">
+        <div
+          class="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center shrink-0"
+        >
+          <svg lucideUsers class="w-6 h-6 text-primary-dark"></svg>
+        </div>
+        <div>
+          <p class="text-sm text-ink-soft">Utilisateurs actifs</p>
+          <p class="text-2xl font-(--font-display) text-ink mt-1">
+            {{ s.nombreUtilisateursActifs }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Volume financier -->
+      <div class="bg-surface rounded-2xl border border-border p-6 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-accent-light flex items-center justify-center shrink-0">
+          <svg lucideWallet class="w-6 h-6 text-accent"></svg>
+        </div>
+        <div>
+          <p class="text-sm text-ink-soft">Volume total échangé</p>
+          <p class="text-2xl font-(--font-display) text-ink mt-1 tabular-nums">
+            {{ s.volumeFinancierTotal | fcfa }}
+            <span class="text-sm text-ink-soft font-sans font-normal">FCFA</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Prêts en retard -->
+      <div class="bg-surface rounded-2xl border border-border p-6 flex items-center gap-4">
+        <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+          <svg lucideAlertTriangle class="w-6 h-6 text-danger"></svg>
+        </div>
+        <div>
+          <p class="text-sm text-ink-soft">Prêts en retard</p>
+          <p class="text-2xl font-(--font-display) text-ink mt-1">
+            {{ s.nombrePretsEnRetard }}
+          </p>
+        </div>
+      </div>
+    </div>
+  }
+</div>
