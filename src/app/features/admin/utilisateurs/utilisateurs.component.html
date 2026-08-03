@@ -1,0 +1,116 @@
+<div class="space-y-6 sm:space-y-8">
+  <!-- En-tête -->
+  <div>
+    <h1 class="font-(--font-display) text-2xl sm:text-3xl text-ink">Gestion des utilisateurs</h1>
+    <p class="text-sm text-ink-soft mt-1">
+      Consultez les comptes, scores et gérez les suspensions.
+    </p>
+  </div>
+
+  @if (erreur()) {
+    <div class="px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-danger text-sm">
+      {{ erreur() }}
+    </div>
+  }
+
+  @if (chargement()) {
+    <div class="space-y-4">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="h-24 rounded-2xl bg-surface border border-border animate-pulse"></div>
+      }
+    </div>
+  } @else if (clients().length === 0) {
+    <div
+      class="bg-surface rounded-2xl border border-border flex flex-col items-center justify-center py-16 px-6 text-center"
+    >
+      <div class="w-14 h-14 rounded-2xl bg-bg flex items-center justify-center mb-4">
+        <svg lucideUsers class="w-6 h-6 text-ink-soft"></svg>
+      </div>
+      <p class="text-sm font-medium text-ink">Aucun utilisateur trouvé</p>
+    </div>
+  } @else {
+    <div class="space-y-3">
+      @for (client of clients(); track client.id) {
+        <div
+          class="bg-surface rounded-2xl border border-border p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-4"
+        >
+          <!-- Avatar et Nom -->
+          <div class="flex items-center gap-3 sm:flex-1 min-w-0">
+            <div
+              class="w-11 h-11 rounded-full flex items-center justify-center font-semibold text-sm shrink-0"
+              [class.bg-primary-light]="client.actif"
+              [class.text-primary-dark]="client.actif"
+              [class.bg-red-50]="!client.actif"
+              [class.text-danger]="!client.actif"
+            >
+              {{ client.prenom.charAt(0) }}{{ client.nom.charAt(0) }}
+            </div>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <p class="font-semibold text-ink text-sm truncate">
+                  {{ client.prenom }} {{ client.nom }}
+                </p>
+                @if (!client.actif) {
+                  <span
+                    class="text-[10px] font-medium uppercase text-danger bg-red-50 px-1.5 py-0.5 rounded"
+                    >Suspendu</span
+                  >
+                }
+              </div>
+              <p class="text-xs text-ink-soft truncate">{{ client.email }}</p>
+              <p class="text-xs text-ink-soft font-mono mt-0.5">{{ client.numeroCompte }}</p>
+            </div>
+          </div>
+
+          <!-- Solde -->
+          <div class="sm:text-right sm:w-40">
+            <p class="text-[10px] uppercase tracking-wide text-ink-soft hidden sm:block">Solde</p>
+            <p class="font-mono font-semibold text-ink tabular-nums text-sm">
+              {{ client.solde | fcfa }} <span class="text-xs text-ink-soft font-sans">FCFA</span>
+            </p>
+          </div>
+
+          <!-- Score -->
+          <div class="sm:w-36">
+            <div
+              class="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-bg justify-center sm:justify-start"
+            >
+              <svg lucideShieldCheck class="w-3.5 h-3.5 text-ink-soft shrink-0"></svg>
+              <span
+                class="text-[11px] font-semibold px-2 py-0.5 rounded-full"
+                [class]="couleurScore(client.scoreSolvabilite)"
+              >
+                {{ client.scoreSolvabilite }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Action -->
+          <div class="sm:w-32 shrink-0">
+            <button
+              (click)="basculerStatut(client)"
+              [disabled]="actionEnCours() === client.id"
+              class="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium transition-colors disabled:opacity-60"
+              [class.bg-red-50]="client.actif"
+              [class.text-danger]="client.actif"
+              [class.hover:bg-red-100]="client.actif"
+              [class.bg-primary-light]="!client.actif"
+              [class.text-primary-dark]="!client.actif"
+              [class.hover:bg-primary]="!client.actif"
+            >
+              @if (actionEnCours() === client.id) {
+                <svg lucideLoaderCircle class="w-3.5 h-3.5 animate-spin"></svg>
+              } @else if (client.actif) {
+                <svg lucideBan class="w-3.5 h-3.5"></svg>
+                Suspendre
+              } @else {
+                <svg lucideCheckCircle class="w-3.5 h-3.5"></svg>
+                Réactiver
+              }
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

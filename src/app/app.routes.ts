@@ -90,11 +90,13 @@ export const routes: Routes = [
             (m) => m.DashboardAdminComponent,
           ),
       },
-      // {
-      //   path: 'utilisateurs',
-      //   loadComponent: () =>
-      //     import('./features/admin/utilisateurs/utilisateurs.component').then(m => m.UtilisateursComponent)
-      // },
+      {
+        path: 'utilisateurs',
+        loadComponent: () =>
+          import('./features/admin/utilisateurs/utilisateurs.component').then(
+            (m) => m.UtilisateursComponent,
+          ),
+      },
       {
         path: 'prets-en-attente',
         loadComponent: () =>
