@@ -57,41 +57,13 @@
 
       <!-- Remboursement total -->
       @if (p.statut === 'VALIDE' && p.montantRestant > 0) {
-        @if (!confirmationTotalOuverte()) {
-          <button
-            (click)="confirmationTotalOuverte.set(true)"
-            class="w-full mt-6 flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-primary text-primary-dark font-medium text-sm hover:bg-primary-light transition-colors"
-          >
-            <svg lucideWallet class="w-4 h-4"></svg>
-            Rembourser le solde restant en une fois
-          </button>
-        } @else {
-          <div class="mt-6 p-4 rounded-xl bg-accent-light space-y-3">
-            <p class="text-sm text-ink">
-              Confirmer le remboursement de
-              <strong class="font-mono">{{ p.montantRestant | fcfa }} FCFA</strong> ?
-            </p>
-            <div class="flex gap-3">
-              <button
-                (click)="confirmationTotalOuverte.set(false)"
-                class="flex-1 py-2.5 rounded-xl border border-border bg-surface text-ink text-sm font-medium hover:bg-bg transition-colors"
-              >
-                Annuler
-              </button>
-              <button
-                (click)="rembourserTotal()"
-                [disabled]="remboursementTotalEnCours()"
-                class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-dark disabled:opacity-60 transition-colors"
-              >
-                @if (remboursementTotalEnCours()) {
-                  <svg lucideLoaderCircle class="w-4 h-4 animate-spin"></svg>
-                } @else {
-                  Confirmer
-                }
-              </button>
-            </div>
-          </div>
-        }
+        <button
+          (click)="demanderConfirmationTotal()"
+          class="w-full mt-6 flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-primary text-primary-dark font-medium text-sm hover:bg-primary-light transition-colors"
+        >
+          <svg lucideWallet class="w-4 h-4"></svg>
+          Rembourser le solde restant en une fois
+        </button>
       }
     </div>
 
@@ -141,7 +113,7 @@
 
               @if (mensualite.statut !== 'PAYE') {
                 <button
-                  (click)="rembourserMensualite(mensualite)"
+                  (click)="demanderConfirmationMensualite(mensualite)"
                   [disabled]="mensualiteEnCours() === mensualite.id"
                   class="shrink-0 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg bg-primary text-white text-xs font-medium hover:bg-primary-dark disabled:opacity-60 transition-colors"
                 >
@@ -157,5 +129,23 @@
         </div>
       </div>
     }
+  }
+
+  <!-- Modale de confirmation remboursement (mensualité ou total) -->
+  @if (cible(); as c) {
+    <app-confirmation-modal
+      [ouvert]="true"
+      [titre]="c.type === 'mensualite' ? 'Payer cette échéance ?' : 'Rembourser le solde restant ?'"
+      [message]="messageConfirmation()"
+      texteConfirmer="Confirmer"
+      variante="primaire"
+      [chargement]="
+        c.type === 'mensualite'
+          ? mensualiteEnCours() === c.mensualite.id
+          : remboursementTotalEnCours()
+      "
+      (confirmer)="confirmerAction()"
+      (annuler)="annulerConfirmation()"
+    />
   }
 </div>

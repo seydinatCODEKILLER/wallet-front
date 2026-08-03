@@ -4,13 +4,18 @@
       <h1 class="font-(--font-display) text-2xl sm:text-3xl text-ink">Mes prêts</h1>
       <p class="text-sm text-ink-soft mt-1">Suivez vos demandes et vos échéanciers</p>
     </div>
-    <a
-      routerLink="/client/prets/nouvelle-demande"
-      class="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors shrink-0"
-    >
-      <svg lucidePlus class="w-4 h-4"></svg>
-      Nouvelle demande
-    </a>
+    <div class="flex items-center gap-3 shrink-0">
+      @if (prets().length > 0) {
+        <app-toggle-vue [options]="optionsVue" [(valeur)]="vue" />
+      }
+      <a
+        routerLink="/client/prets/nouvelle-demande"
+        class="hidden sm:flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary-dark transition-colors shrink-0"
+      >
+        <svg lucidePlus class="w-4 h-4"></svg>
+        Nouvelle demande
+      </a>
+    </div>
   </div>
 
   @if (chargement()) {
@@ -37,43 +42,90 @@
       </a>
     </div>
   } @else {
-    <div class="space-y-3">
-      @for (pret of prets(); track pret.id) {
-        <a
-          [routerLink]="['/client/prets', pret.id]"
-          class="flex items-center gap-4 p-5 bg-surface rounded-2xl border border-border hover:border-primary/40 hover:shadow-sm transition-all"
-        >
-          <div
-            class="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center shrink-0"
+    @if (vue() === 'cartes') {
+      <!-- Vue cartes (détaillée) -->
+      <div class="space-y-3">
+        @for (pret of pretsPage(); track pret.id) {
+          <a
+            [routerLink]="['/client/prets', pret.id]"
+            class="flex items-center gap-4 p-5 bg-surface rounded-2xl border border-border hover:border-primary/40 hover:shadow-sm transition-all"
           >
-            <svg lucideLandmark class="w-5 h-5 text-primary-dark"></svg>
-          </div>
-
-          <div class="flex-1 min-w-0">
-            <div class="flex items-center gap-2 mb-1">
-              <p class="font-semibold text-ink text-sm truncate">{{ pret.motif }}</p>
-              <app-badge-statut [statut]="pret.statut" />
+            <div
+              class="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center shrink-0"
+            >
+              <svg lucideLandmark class="w-5 h-5 text-primary-dark"></svg>
             </div>
-            <p class="text-xs text-ink-soft">
-              {{ pret.dureeEnMois }} mois · Demandé le {{ pret.dateCreation | date: 'd MMM yyyy' }}
-            </p>
-          </div>
 
-          <div class="text-right shrink-0 hidden xs:block">
-            <p class="text-sm font-mono font-semibold text-ink tabular-nums">
-              {{ pret.montant | fcfa }} FCFA
-            </p>
-            @if (pret.statut === 'VALIDE') {
-              <p class="text-xs text-ink-soft mt-0.5">
-                Reste {{ pret.montantRestant | fcfa }} FCFA
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1">
+                <p class="font-semibold text-ink text-sm truncate">{{ pret.motif }}</p>
+                <app-badge-statut [statut]="pret.statut" />
+              </div>
+              <p class="text-xs text-ink-soft">
+                {{ pret.dureeEnMois }} mois · Demandé le
+                {{ pret.dateCreation | date: 'd MMM yyyy' }}
               </p>
-            }
-          </div>
+            </div>
 
-          <svg lucideChevronRight class="w-4 h-4 text-ink-soft shrink-0"></svg>
-        </a>
-      }
-    </div>
+            <div class="text-right shrink-0 hidden xs:block">
+              <p class="text-sm font-mono font-semibold text-ink tabular-nums">
+                {{ pret.montant | fcfa }} FCFA
+              </p>
+              @if (pret.statut === 'VALIDE') {
+                <p class="text-xs text-ink-soft mt-0.5">
+                  Reste {{ pret.montantRestant | fcfa }} FCFA
+                </p>
+              }
+            </div>
+
+            <svg lucideChevronRight class="w-4 h-4 text-ink-soft shrink-0"></svg>
+          </a>
+        }
+      </div>
+    } @else {
+      <!-- Vue tableau (compacte) -->
+      <div
+        class="bg-surface rounded-2xl border border-border divide-y divide-border overflow-hidden"
+      >
+        @for (pret of pretsPage(); track pret.id) {
+          <a
+            [routerLink]="['/client/prets', pret.id]"
+            class="flex items-center gap-4 px-4 sm:px-5 py-3.5 hover:bg-bg/60 transition-colors"
+          >
+            <div
+              class="w-9 h-9 rounded-full bg-primary-light flex items-center justify-center shrink-0"
+            >
+              <svg lucideLandmark class="w-4 h-4 text-primary-dark"></svg>
+            </div>
+
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2">
+                <p class="font-semibold text-ink text-sm truncate">{{ pret.motif }}</p>
+                <app-badge-statut [statut]="pret.statut" />
+              </div>
+              <p class="text-xs text-ink-soft truncate">
+                {{ pret.dureeEnMois }} mois · {{ pret.dateCreation | date: 'd MMM yyyy' }}
+              </p>
+            </div>
+
+            <div class="text-right shrink-0 hidden sm:block">
+              <p class="text-sm font-mono font-semibold text-ink tabular-nums">
+                {{ pret.montant | fcfa }}
+              </p>
+              @if (pret.statut === 'VALIDE') {
+                <p class="text-[10px] text-ink-soft mt-0.5">
+                  Reste {{ pret.montantRestant | fcfa }}
+                </p>
+              }
+            </div>
+
+            <svg lucideChevronRight class="w-4 h-4 text-ink-soft shrink-0"></svg>
+          </a>
+        }
+      </div>
+    }
+
+    <app-pagination [(pageActuelle)]="pageActuelle" [totalPages]="totalPages()" />
   }
 
   <!-- Bouton flottant mobile -->

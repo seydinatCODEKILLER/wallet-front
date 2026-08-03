@@ -14,7 +14,7 @@
       {{ erreur() }}
     </div>
   } @else if (stats(); as s) {
-    <!-- Cartes de statistiques -->
+    <!-- Cartes de statistiques (KPIs) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
       <!-- Utilisateurs actifs -->
       <div class="bg-surface rounded-2xl border border-border p-6 flex items-center gap-4">
@@ -55,6 +55,41 @@
           <p class="text-2xl font-(--font-display) text-ink mt-1">
             {{ s.nombrePretsEnRetard }}
           </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Graphiques -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+      <!-- Graphique 1 : Transactions (Courbe) - Prend 2 colonnes sur desktop -->
+      <div class="bg-surface rounded-2xl border border-border p-6 lg:col-span-2">
+        <h3 class="font-semibold text-ink text-base mb-4">Transactions des 7 derniers jours</h3>
+        <div class="h-64">
+          <canvas baseChart [data]="lineChartData()" [options]="lineChartOptions" type="line">
+          </canvas>
+        </div>
+      </div>
+
+      <!-- Graphique 2 : Scores (Anneau) - Prend 1 colonne -->
+      <div class="bg-surface rounded-2xl border border-border p-6">
+        <h3 class="font-semibold text-ink text-base mb-4">Solvabilité des clients</h3>
+        <div class="h-64 flex items-center justify-center">
+          <canvas
+            baseChart
+            [data]="doughnutChartData()"
+            [options]="doughnutChartOptions"
+            type="doughnut"
+          >
+          </canvas>
+        </div>
+      </div>
+
+      <!-- Graphique 3 : Prêts (Barres) - Prend toute la largeur -->
+      <div class="bg-surface rounded-2xl border border-border p-6 lg:col-span-3">
+        <h3 class="font-semibold text-ink text-base mb-4">Demandes de prêts sur 6 mois</h3>
+        <div class="h-64">
+          <canvas baseChart [data]="barChartData()" [options]="barChartOptions" type="bar">
+          </canvas>
         </div>
       </div>
     </div>
