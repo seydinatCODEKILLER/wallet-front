@@ -65,13 +65,13 @@ export const routes: Routes = [
             (m) => m.DetailPretComponent,
           ),
       },
-      // {
-      //   path: 'historique',
-      //   loadComponent: () =>
-      //     import('./features/client/historique/historique.component').then(
-      //       (m) => m.HistoriqueComponent,
-      //     ),
-      // },
+      {
+        path: 'historique',
+        loadComponent: () =>
+          import('./features/client/historique/historique.component').then(
+            (m) => m.HistoriqueComponent,
+          ),
+      },
     ],
   },
 

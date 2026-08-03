@@ -1,0 +1,146 @@
+<div class="max-w-2xl mx-auto space-y-6">
+  <a
+    routerLink="/client/dashboard"
+    class="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-ink transition-colors"
+  >
+    <svg lucideArrowLeft class="w-4 h-4"></svg>
+    Retour au tableau de bord
+  </a>
+
+  <div>
+    <h1 class="font-(--font-display) text-2xl sm:text-3xl text-ink">Historique</h1>
+    <p class="text-sm text-ink-soft mt-1">L'ensemble de vos transactions, entrées et sorties.</p>
+  </div>
+
+  <!-- Résumé entrées / sorties -->
+  <div class="grid grid-cols-2 gap-3 sm:gap-4">
+    <div class="bg-surface rounded-2xl border border-border p-4 sm:p-5">
+      <p class="text-xs text-ink-soft mb-1.5">Total entrées</p>
+      <p class="font-mono font-semibold text-primary-dark text-lg sm:text-xl tabular-nums">
+        +{{ totalEntrees() | fcfa }}
+      </p>
+    </div>
+    <div class="bg-surface rounded-2xl border border-border p-4 sm:p-5">
+      <p class="text-xs text-ink-soft mb-1.5">Total sorties</p>
+      <p class="font-mono font-semibold text-danger text-lg sm:text-xl tabular-nums">
+        -{{ totalSorties() | fcfa }}
+      </p>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="flex items-center gap-2">
+    <button
+      (click)="changerFiltre('TOUS')"
+      class="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+      [class.bg-primary]="filtreSens() === 'TOUS'"
+      [class.text-white]="filtreSens() === 'TOUS'"
+      [class.bg-surface]="filtreSens() !== 'TOUS'"
+      [class.text-ink-soft]="filtreSens() !== 'TOUS'"
+      [class.border]="filtreSens() !== 'TOUS'"
+      [class.border-border]="filtreSens() !== 'TOUS'"
+    >
+      Tout
+    </button>
+    <button
+      (click)="changerFiltre('ENTREE')"
+      class="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+      [class.bg-primary]="filtreSens() === 'ENTREE'"
+      [class.text-white]="filtreSens() === 'ENTREE'"
+      [class.bg-surface]="filtreSens() !== 'ENTREE'"
+      [class.text-ink-soft]="filtreSens() !== 'ENTREE'"
+      [class.border]="filtreSens() !== 'ENTREE'"
+      [class.border-border]="filtreSens() !== 'ENTREE'"
+    >
+      Entrées
+    </button>
+    <button
+      (click)="changerFiltre('SORTIE')"
+      class="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+      [class.bg-primary]="filtreSens() === 'SORTIE'"
+      [class.text-white]="filtreSens() === 'SORTIE'"
+      [class.bg-surface]="filtreSens() !== 'SORTIE'"
+      [class.text-ink-soft]="filtreSens() !== 'SORTIE'"
+      [class.border]="filtreSens() !== 'SORTIE'"
+      [class.border-border]="filtreSens() !== 'SORTIE'"
+    >
+      Sorties
+    </button>
+  </div>
+
+  <!-- Contenu -->
+  @if (erreur()) {
+    <div class="px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-danger text-sm">
+      {{ erreur() }}
+    </div>
+  } @else if (chargement()) {
+    <div class="space-y-3">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="h-16 rounded-xl bg-surface border border-border animate-pulse"></div>
+      }
+    </div>
+  } @else if (transactionsFiltrees().length === 0) {
+    <div
+      class="bg-surface rounded-2xl border border-border flex flex-col items-center justify-center py-14 px-6 text-center"
+    >
+      <div class="w-14 h-14 rounded-2xl bg-bg flex items-center justify-center mb-4">
+        <svg lucideInbox class="w-6 h-6 text-ink-soft"></svg>
+      </div>
+      <p class="text-sm font-medium text-ink">Aucune transaction</p>
+      <p class="text-xs text-ink-soft mt-1">Aucun résultat pour ce filtre.</p>
+    </div>
+  } @else {
+    <div class="space-y-6">
+      @for (groupe of groupes(); track groupe.libelleDate) {
+        <div>
+          <p class="text-xs font-semibold text-ink-soft uppercase tracking-wide mb-3 px-1">
+            {{ groupe.libelleDate }}
+          </p>
+
+          <div
+            class="bg-surface rounded-2xl border border-border divide-y divide-border overflow-hidden"
+          >
+            @for (transaction of groupe.transactions; track transaction.id) {
+              <div
+                class="flex items-center gap-3 sm:gap-4 px-5 sm:px-6 py-4 hover:bg-bg/60 transition-colors"
+              >
+                <div
+                  class="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center shrink-0"
+                  [class.bg-primary-light]="transaction.sens === 'ENTREE'"
+                  [class.bg-red-50]="transaction.sens === 'SORTIE'"
+                >
+                  @if (transaction.sens === 'ENTREE') {
+                    <svg
+                      lucideArrowDownLeft
+                      class="w-4 h-4 sm:w-4.5 sm:h-4.5 text-primary-dark"
+                    ></svg>
+                  } @else {
+                    <svg lucideArrowUpRight class="w-4 h-4 sm:w-4.5 sm:h-4.5 text-danger"></svg>
+                  }
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-ink truncate">{{ transaction.description }}</p>
+                  <p class="text-xs text-ink-soft mt-0.5">
+                    {{ transaction.dateTransaction | date: 'HH:mm' }}
+                  </p>
+                </div>
+
+                <div class="text-right shrink-0">
+                  <p
+                    class="text-sm font-mono font-semibold tabular-nums"
+                    [class.text-primary-dark]="transaction.sens === 'ENTREE'"
+                    [class.text-danger]="transaction.sens === 'SORTIE'"
+                  >
+                    {{ transaction.sens === 'ENTREE' ? '+' : '-' }}{{ transaction.montant | fcfa }}
+                  </p>
+                  <p class="text-[10px] text-ink-soft font-mono">FCFA</p>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
