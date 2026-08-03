@@ -1,0 +1,124 @@
+<div class="max-w-lg mx-auto space-y-6">
+  <a
+    routerLink="/client/dashboard"
+    class="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-ink transition-colors"
+  >
+    <svg lucideArrowLeft class="w-4 h-4"></svg>
+    Retour au tableau de bord
+  </a>
+
+  @if (succes()) {
+    <!-- État de succès -->
+    <div
+      class="bg-surface rounded-2xl border border-border p-10 flex flex-col items-center text-center"
+    >
+      <div class="w-16 h-16 rounded-full bg-primary-light flex items-center justify-center mb-5">
+        <svg lucideCheck class="w-7 h-7 text-primary-dark"></svg>
+      </div>
+      <h2 class="font-(--font-display) text-xl text-ink mb-1">Virement envoyé</h2>
+      <p class="text-sm text-ink-soft">Redirection vers votre tableau de bord...</p>
+    </div>
+  } @else {
+    <div>
+      <h1 class="font-(--font-display) text-2xl sm:text-3xl text-ink">Faire un virement</h1>
+      <p class="text-sm text-ink-soft mt-1">
+        Solde disponible :
+        <span class="font-mono font-medium text-ink"
+          >{{ compteStore.compte()?.solde ?? 0 | fcfa }} FCFA</span
+        >
+      </p>
+    </div>
+
+    @if (erreur()) {
+      <div class="px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-danger text-sm">
+        {{ erreur() }}
+      </div>
+    }
+
+    <form
+      [formGroup]="form"
+      (ngSubmit)="soumettre()"
+      class="bg-surface rounded-2xl border border-border p-6 space-y-5"
+    >
+      <!-- Numéro de compte + recherche en temps réel -->
+      <div>
+        <label for="numeroCompteDestinataire" class="block text-sm font-medium text-ink mb-1.5">
+          Numéro de compte du bénéficiaire
+        </label>
+        <input
+          id="numeroCompteDestinataire"
+          type="text"
+          formControlName="numeroCompteDestinataire"
+          placeholder="DTW1234567890"
+          class="w-full px-4 py-2.5 rounded-xl border border-border bg-bg text-ink font-mono placeholder:text-ink-soft/50 placeholder:font-sans focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+        />
+
+        <!-- Statut de la recherche -->
+        @let resultat = rechercheBeneficiaire();
+        @if (resultat.statut === 'recherche') {
+          <div class="flex items-center gap-2 mt-2 text-xs text-ink-soft">
+            <svg lucideLoaderCircle class="w-3.5 h-3.5 animate-spin"></svg>
+            Recherche du bénéficiaire...
+          </div>
+        } @else if (resultat.statut === 'trouve') {
+          <div class="flex items-center gap-2 mt-2 px-3 py-2 rounded-lg bg-primary-light">
+            <svg lucideCheck class="w-4 h-4 text-primary-dark shrink-0"></svg>
+            <p class="text-sm text-primary-dark font-medium truncate">
+              {{ resultat.beneficiaire.nomComplet }}
+            </p>
+          </div>
+        } @else if (resultat.statut === 'introuvable') {
+          <div class="flex items-center gap-2 mt-2 text-xs text-danger">
+            <svg lucideCircleAlert class="w-3.5 h-3.5"></svg>
+            Aucun compte trouvé avec ce numéro
+          </div>
+        }
+      </div>
+
+      <div>
+        <label for="montant" class="block text-sm font-medium text-ink mb-1.5"
+          >Montant (FCFA)</label
+        >
+        <input
+          id="montant"
+          type="number"
+          formControlName="montant"
+          placeholder="10000"
+          class="w-full px-4 py-2.5 rounded-xl border border-border bg-bg text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+        />
+        @if (soldeInsuffisant()) {
+          <p class="mt-1.5 text-xs text-danger">Solde insuffisant pour ce montant</p>
+        } @else if (form.controls.montant.invalid && form.controls.montant.touched) {
+          <p class="mt-1.5 text-xs text-danger">Montant invalide</p>
+        }
+      </div>
+
+      <div>
+        <label for="description" class="block text-sm font-medium text-ink mb-1.5">
+          Description <span class="text-ink-soft font-normal">(optionnel)</span>
+        </label>
+        <input
+          id="description"
+          type="text"
+          formControlName="description"
+          placeholder="Ex: Remboursement déjeuner"
+          class="w-full px-4 py-2.5 rounded-xl border border-border bg-bg text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+        />
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="chargement()"
+        class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-dark disabled:opacity-60 transition-colors"
+      >
+        @if (chargement()) {
+          <svg lucideLoaderCircle class="w-4 h-4 animate-spin"></svg>
+          Envoi en cours...
+        } @else {
+          <svg lucideSend class="w-4 h-4"></svg>
+          Envoyer le virement
+        }
+      </button>
+    </form>
+  }
+</div>

@@ -39,11 +39,11 @@ export const routes: Routes = [
             (m) => m.DashboardClientComponent,
           ),
       },
-      // {
-      //   path: 'virement',
-      //   loadComponent: () =>
-      //     import('./features/client/virement/virement.component').then((m) => m.VirementComponent),
-      // },
+      {
+        path: 'virement',
+        loadComponent: () =>
+          import('./features/client/virement/virement.component').then((m) => m.VirementComponent),
+      },
       {
         path: 'prets',
         loadComponent: () =>
