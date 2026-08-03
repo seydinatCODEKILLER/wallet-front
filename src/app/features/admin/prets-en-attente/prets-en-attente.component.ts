@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import {
   LucideLandmark,
@@ -8,15 +8,27 @@ import {
   LucideShieldCheck,
 } from '@lucide/angular';
 import { FcfaPipe } from '../../../shared/pipes/fcfa.pipe';
+import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
+import {
+  ToggleVueComponent,
+  OptionToggle,
+} from '../../../shared/components/toggle-vue/toggle-vue.component';
 import { AdminService } from '../../../core/services/admin.service';
 import { PretResponse } from '../../../core/models/pret.model';
 import { ScoreSolvabilite } from '../../../core/models/enums';
+
+type TypeAction = 'valider' | 'rejeter';
+type VueListe = 'tableau' | 'cartes';
 
 @Component({
   selector: 'app-prets-en-attente',
   imports: [
     DatePipe,
     FcfaPipe,
+    ConfirmationModalComponent,
+    PaginationComponent,
+    ToggleVueComponent,
     LucideLandmark,
     LucideLoaderCircle,
     LucideCheck,
@@ -32,9 +44,30 @@ export class PretsEnAttenteComponent implements OnInit {
   protected readonly erreur = signal<string | null>(null);
   protected readonly demandes = signal<PretResponse[]>([]);
 
-  protected readonly actionEnCours = signal<{ id: number; type: 'valider' | 'rejeter' } | null>(
-    null,
+  protected readonly actionEnCours = signal<{ id: number; type: TypeAction } | null>(null);
+
+  // Prêt + action ciblés par la modale de confirmation (null = modale fermée)
+  protected readonly cible = signal<{ pret: PretResponse; type: TypeAction } | null>(null);
+
+  // Vue actuelle, pilotée par app-toggle-vue via [(valeur)]
+  protected readonly vue = signal<VueListe>('tableau');
+  protected readonly optionsVue: OptionToggle<VueListe>[] = [
+    { valeur: 'tableau', label: 'Vue tableau', icone: 'list' },
+    { valeur: 'cartes', label: 'Vue cartes', icone: 'grid' },
+  ];
+
+  // Page actuelle, pilotée par app-pagination via [(pageActuelle)]
+  protected readonly pageActuelle = signal(1);
+  private readonly taillePage = 8;
+
+  protected readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.demandes().length / this.taillePage)),
   );
+
+  protected readonly demandesPage = computed(() => {
+    const debut = (this.pageActuelle() - 1) * this.taillePage;
+    return this.demandes().slice(debut, debut + this.taillePage);
+  });
 
   ngOnInit(): void {
     this.chargerDemandes();
@@ -54,32 +87,45 @@ export class PretsEnAttenteComponent implements OnInit {
     });
   }
 
-  valider(pret: PretResponse): void {
-    this.actionEnCours.set({ id: pret.id, type: 'valider' });
-    this.adminService.validerPret(pret.id).subscribe({
-      next: () => {
-        // On retire le prêt validé de la liste (mise à jour optimiste)
-        this.demandes.update((list) => list.filter((p) => p.id !== pret.id));
-        this.actionEnCours.set(null);
-      },
-      error: () => {
-        this.erreur.set('Erreur lors de la validation du prêt.');
-        this.actionEnCours.set(null);
-      },
-    });
+  demanderConfirmation(pret: PretResponse, type: TypeAction): void {
+    this.cible.set({ pret, type });
   }
 
-  rejeter(pret: PretResponse): void {
-    this.actionEnCours.set({ id: pret.id, type: 'rejeter' });
-    this.adminService.rejeterPret(pret.id).subscribe({
+  annulerConfirmation(): void {
+    if (this.actionEnCours() !== null) return;
+    this.cible.set(null);
+  }
+
+  confirmerAction(): void {
+    const cible = this.cible();
+    if (!cible) return;
+
+    const { pret, type } = cible;
+    this.actionEnCours.set({ id: pret.id, type });
+
+    const action$ =
+      type === 'valider'
+        ? this.adminService.validerPret(pret.id)
+        : this.adminService.rejeterPret(pret.id);
+
+    action$.subscribe({
       next: () => {
-        // On retire le prêt rejeté de la liste
         this.demandes.update((list) => list.filter((p) => p.id !== pret.id));
         this.actionEnCours.set(null);
+        this.cible.set(null);
+
+        if (this.demandesPage().length === 0 && this.pageActuelle() > 1) {
+          this.pageActuelle.update((p) => p - 1);
+        }
       },
       error: () => {
-        this.erreur.set('Erreur lors du rejet du prêt.');
+        this.erreur.set(
+          type === 'valider'
+            ? 'Erreur lors de la validation du prêt.'
+            : 'Erreur lors du rejet du prêt.',
+        );
         this.actionEnCours.set(null);
+        this.cible.set(null);
       },
     });
   }

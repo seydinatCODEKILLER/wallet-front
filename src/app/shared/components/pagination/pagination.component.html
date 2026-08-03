@@ -1,0 +1,25 @@
+@if (totalPages() > 1) {
+  <div class="flex items-center justify-between">
+    <p class="text-xs text-ink-soft">Page {{ pageActuelle() }} sur {{ totalPages() }}</p>
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        (click)="precedente()"
+        [disabled]="estPremierePage()"
+        class="w-9 h-9 flex items-center justify-center rounded-xl border border-border text-ink-soft hover:text-ink hover:bg-bg disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+        aria-label="Page précédente"
+      >
+        <svg lucideChevronLeft class="w-4 h-4"></svg>
+      </button>
+      <button
+        type="button"
+        (click)="suivante()"
+        [disabled]="estDernierePage()"
+        class="w-9 h-9 flex items-center justify-center rounded-xl border border-border text-ink-soft hover:text-ink hover:bg-bg disabled:opacity-40 disabled:hover:bg-transparent transition-colors"
+        aria-label="Page suivante"
+      >
+        <svg lucideChevronRight class="w-4 h-4"></svg>
+      </button>
+    </div>
+  </div>
+}
