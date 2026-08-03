@@ -1,0 +1,54 @@
+@if (ouvert()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <!-- Overlay -->
+    <div (click)="onFermeture()" class="absolute inset-0 bg-ink/50 backdrop-blur-sm"></div>
+
+    <!-- Carte -->
+    <div
+      class="relative bg-surface rounded-2xl border border-border shadow-xl w-full max-w-sm p-6 sm:p-7"
+    >
+      <div class="flex flex-col items-center text-center">
+        <div
+          class="w-14 h-14 rounded-full flex items-center justify-center mb-4"
+          [class.bg-red-50]="variante() === 'danger'"
+          [class.bg-primary-light]="variante() === 'primaire'"
+        >
+          @if (variante() === 'danger') {
+            <svg lucideTriangleAlert class="w-6 h-6 text-danger"></svg>
+          } @else {
+            <svg lucideCircleHelp class="w-6 h-6 text-primary-dark"></svg>
+          }
+        </div>
+
+        <h2 class="font-(--font-display) text-lg text-ink mb-1.5">{{ titre() }}</h2>
+        <p class="text-sm text-ink-soft leading-relaxed">{{ message() }}</p>
+      </div>
+
+      <div class="flex items-center gap-3 mt-6">
+        <button
+          type="button"
+          (click)="onFermeture()"
+          [disabled]="chargement()"
+          class="flex-1 py-2.5 rounded-xl border border-border text-ink text-sm font-medium hover:bg-bg transition-colors disabled:opacity-60"
+        >
+          {{ texteAnnuler() }}
+        </button>
+        <button
+          type="button"
+          (click)="onConfirmer()"
+          [disabled]="chargement()"
+          class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-white text-sm font-medium transition-colors disabled:opacity-60"
+          [class.bg-danger]="variante() === 'danger'"
+          [class.hover:bg-red-700]="variante() === 'danger'"
+          [class.bg-primary]="variante() === 'primaire'"
+          [class.hover:bg-primary-dark]="variante() === 'primaire'"
+        >
+          @if (chargement()) {
+            <svg lucideLoaderCircle class="w-4 h-4 animate-spin"></svg>
+          }
+          {{ texteConfirmer() }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

@@ -7,6 +7,7 @@ import {
   LucideShieldCheck,
 } from '@lucide/angular';
 import { FcfaPipe } from '../../../shared/pipes/fcfa.pipe';
+import { ConfirmationModalComponent } from '../../../shared/components/confirmation-modal/confirmation-modal.component';
 import { AdminService } from '../../../core/services/admin.service';
 import { ClientResponse } from '../../../core/models/utilisateur.model';
 import { ScoreSolvabilite } from '../../../core/models/enums';
@@ -15,6 +16,7 @@ import { ScoreSolvabilite } from '../../../core/models/enums';
   selector: 'app-utilisateurs',
   imports: [
     FcfaPipe,
+    ConfirmationModalComponent,
     LucideUsers,
     LucideLoaderCircle,
     LucideBan,
@@ -32,6 +34,9 @@ export class UtilisateursComponent implements OnInit {
 
   // Pour suivre quel utilisateur est en cours de suspension/réactivation
   protected readonly actionEnCours = signal<number | null>(null);
+
+  // Client actuellement ciblé par la modale de confirmation (null = modale fermée)
+  protected readonly clientCible = signal<ClientResponse | null>(null);
 
   ngOnInit(): void {
     this.chargerClients();
@@ -51,7 +56,19 @@ export class UtilisateursComponent implements OnInit {
     });
   }
 
-  basculerStatut(client: ClientResponse): void {
+  demanderConfirmation(client: ClientResponse): void {
+    this.clientCible.set(client);
+  }
+
+  annulerConfirmation(): void {
+    if (this.actionEnCours() !== null) return;
+    this.clientCible.set(null);
+  }
+
+  confirmerBasculement(): void {
+    const client = this.clientCible();
+    if (!client) return;
+
     this.actionEnCours.set(client.id);
 
     const action$ = client.actif
@@ -60,15 +77,16 @@ export class UtilisateursComponent implements OnInit {
 
     action$.subscribe({
       next: (clientMisAJour) => {
-        // On met à jour le client spécifique dans la liste
         this.clients.update((list) =>
           list.map((c) => (c.id === clientMisAJour.id ? clientMisAJour : c)),
         );
         this.actionEnCours.set(null);
+        this.clientCible.set(null);
       },
       error: () => {
         this.erreur.set('Erreur lors de la modification du statut du client.');
         this.actionEnCours.set(null);
+        this.clientCible.set(null);
       },
     });
   }
