@@ -45,7 +45,59 @@
   <div class="w-full lg:w-1/2 flex items-center justify-center bg-bg p-8 overflow-y-auto">
     <div class="w-full max-w-sm py-8">
       <h1 class="font-(--font-display) text-2xl text-ink mb-1">Créer un compte</h1>
-      <p class="text-sm text-ink-soft mb-8">Rejoignez Dakar-Tech Wallet en quelques instants.</p>
+      <p class="text-sm text-ink-soft mb-6">Rejoignez Dakar-Tech Wallet en quelques instants.</p>
+
+      <!-- Indicateur de progression -->
+      <div class="flex items-center gap-2 mb-8">
+        <div class="flex items-center gap-2 flex-1">
+          <div
+            class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 transition-colors duration-300"
+            [class.bg-primary]="etape() >= 1"
+            [class.text-white]="etape() >= 1"
+            [class.bg-border]="etape() < 1"
+            [class.text-ink-soft]="etape() < 1"
+          >
+            @if (etape() > 1) {
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              </svg>
+            } @else {
+              1
+            }
+          </div>
+          <span
+            class="text-xs font-medium transition-colors duration-300"
+            [class.text-ink]="etape() >= 1"
+            [class.text-ink-soft]="etape() < 1"
+            >Identité</span
+          >
+        </div>
+
+        <div class="flex-1 h-0.5 rounded-full bg-border overflow-hidden">
+          <div
+            class="h-full bg-primary transition-all duration-500 ease-out"
+            [style.width]="etape() >= 2 ? '100%' : '0%'"
+          ></div>
+        </div>
+
+        <div class="flex items-center gap-2 flex-1 justify-end">
+          <span
+            class="text-xs font-medium transition-colors duration-300"
+            [class.text-ink]="etape() >= 2"
+            [class.text-ink-soft]="etape() < 2"
+            >Sécurité</span
+          >
+          <div
+            class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0 transition-colors duration-300"
+            [class.bg-primary]="etape() >= 2"
+            [class.text-white]="etape() >= 2"
+            [class.bg-border]="etape() < 2"
+            [class.text-ink-soft]="etape() < 2"
+          >
+            2
+          </div>
+        </div>
+      </div>
 
       @if (erreur()) {
         <div class="mb-6 px-4 py-3 rounded-xl bg-red-50 border border-red-100 text-danger text-sm">
@@ -54,124 +106,161 @@
       }
 
       <form [formGroup]="form" (ngSubmit)="soumettre()" class="space-y-4">
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label for="prenom" class="block text-sm font-medium text-ink mb-1.5">Prénom</label>
-            <input
-              id="prenom"
-              type="text"
-              formControlName="prenom"
-              placeholder="Aminata"
-              class="w-full px-4 py-2.5 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-            />
-            @if (form.controls.prenom.invalid && form.controls.prenom.touched) {
-              <p class="mt-1.5 text-xs text-danger">Requis</p>
-            }
+        <!-- Étape 1 : Identité -->
+        @if (etape() === 1) {
+          <div class="space-y-4 animate-[fadeSlideIn_0.3s_ease-out]">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label for="prenom" class="block text-sm font-medium text-ink mb-1.5">Prénom</label>
+                <input
+                  id="prenom"
+                  type="text"
+                  formControlName="prenom"
+                  placeholder="Aminata"
+                  class="w-full px-4 py-2.5 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                />
+                @if (form.controls.prenom.invalid && form.controls.prenom.touched) {
+                  <p class="mt-1.5 text-xs text-danger">Requis</p>
+                }
+              </div>
+
+              <div>
+                <label for="nom" class="block text-sm font-medium text-ink mb-1.5">Nom</label>
+                <input
+                  id="nom"
+                  type="text"
+                  formControlName="nom"
+                  placeholder="Diop"
+                  class="w-full px-4 py-2.5 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                />
+                @if (form.controls.nom.invalid && form.controls.nom.touched) {
+                  <p class="mt-1.5 text-xs text-danger">Requis</p>
+                }
+              </div>
+            </div>
+
+            <div>
+              <label for="email" class="block text-sm font-medium text-ink mb-1.5">Email</label>
+              <input
+                id="email"
+                type="email"
+                formControlName="email"
+                placeholder="vous@exemple.com"
+                class="w-full px-4 py-2.5 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+              />
+              @if (form.controls.email.invalid && form.controls.email.touched) {
+                <p class="mt-1.5 text-xs text-danger">Adresse email valide requise</p>
+              }
+            </div>
+
+            <div>
+              <label for="telephone" class="block text-sm font-medium text-ink mb-1.5"
+                >Téléphone</label
+              >
+              <input
+                id="telephone"
+                type="tel"
+                formControlName="telephone"
+                placeholder="771234567"
+                class="w-full px-4 py-2.5 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+              />
+              @if (form.controls.telephone.invalid && form.controls.telephone.touched) {
+                <p class="mt-1.5 text-xs text-danger">9 chiffres attendus (ex: 771234567)</p>
+              }
+            </div>
+
+            <button
+              type="button"
+              (click)="suivant()"
+              class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-dark transition-colors mt-2"
+            >
+              Continuer
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </button>
           </div>
+        }
 
-          <div>
-            <label for="nom" class="block text-sm font-medium text-ink mb-1.5">Nom</label>
-            <input
-              id="nom"
-              type="text"
-              formControlName="nom"
-              placeholder="Diop"
-              class="w-full px-4 py-2.5 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-            />
-            @if (form.controls.nom.invalid && form.controls.nom.touched) {
-              <p class="mt-1.5 text-xs text-danger">Requis</p>
-            }
+        <!-- Étape 2 : Sécurité -->
+        @if (etape() === 2) {
+          <div class="space-y-4 animate-[fadeSlideIn_0.3s_ease-out]">
+            <div>
+              <label for="motDePasse" class="block text-sm font-medium text-ink mb-1.5"
+                >Mot de passe</label
+              >
+              <input
+                id="motDePasse"
+                type="password"
+                formControlName="motDePasse"
+                placeholder="6 caractères minimum"
+                class="w-full px-4 py-2.5 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+              />
+              @if (form.controls.motDePasse.invalid && form.controls.motDePasse.touched) {
+                <p class="mt-1.5 text-xs text-danger">6 caractères minimum</p>
+              }
+            </div>
+
+            <div>
+              <label for="confirmationMotDePasse" class="block text-sm font-medium text-ink mb-1.5"
+                >Confirmer le mot de passe</label
+              >
+              <input
+                id="confirmationMotDePasse"
+                type="password"
+                formControlName="confirmationMotDePasse"
+                placeholder="••••••••"
+                class="w-full px-4 py-2.5 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+              />
+              @if (
+                form.errors?.['motsDePasseDifferents'] &&
+                form.controls.confirmationMotDePasse.touched
+              ) {
+                <p class="mt-1.5 text-xs text-danger">Les mots de passe ne correspondent pas</p>
+              }
+            </div>
+
+            <div class="flex gap-3 mt-2">
+              <button
+                type="button"
+                (click)="precedent()"
+                class="flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-border bg-surface text-ink text-sm font-medium hover:bg-bg transition-colors"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+                </svg>
+                Retour
+              </button>
+
+              <button
+                type="submit"
+                [disabled]="chargement()"
+                class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-dark disabled:opacity-60 transition-colors"
+              >
+                @if (chargement()) {
+                  <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+                  </svg>
+                  Création...
+                } @else {
+                  Créer mon compte
+                }
+              </button>
+            </div>
           </div>
-        </div>
-
-        <div>
-          <label for="email" class="block text-sm font-medium text-ink mb-1.5">Email</label>
-          <input
-            id="email"
-            type="email"
-            formControlName="email"
-            placeholder="vous@exemple.com"
-            class="w-full px-4 py-2.5 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-          />
-          @if (form.controls.email.invalid && form.controls.email.touched) {
-            <p class="mt-1.5 text-xs text-danger">Adresse email valide requise</p>
-          }
-        </div>
-
-        <div>
-          <label for="telephone" class="block text-sm font-medium text-ink mb-1.5">Téléphone</label>
-          <input
-            id="telephone"
-            type="tel"
-            formControlName="telephone"
-            placeholder="771234567"
-            class="w-full px-4 py-2.5 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-          />
-          @if (form.controls.telephone.invalid && form.controls.telephone.touched) {
-            <p class="mt-1.5 text-xs text-danger">9 chiffres attendus (ex: 771234567)</p>
-          }
-        </div>
-
-        <div>
-          <label for="motDePasse" class="block text-sm font-medium text-ink mb-1.5"
-            >Mot de passe</label
-          >
-          <input
-            id="motDePasse"
-            type="password"
-            formControlName="motDePasse"
-            placeholder="6 caractères minimum"
-            class="w-full px-4 py-2.5 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-          />
-          @if (form.controls.motDePasse.invalid && form.controls.motDePasse.touched) {
-            <p class="mt-1.5 text-xs text-danger">6 caractères minimum</p>
-          }
-        </div>
-
-        <div>
-          <label for="confirmationMotDePasse" class="block text-sm font-medium text-ink mb-1.5"
-            >Confirmer le mot de passe</label
-          >
-          <input
-            id="confirmationMotDePasse"
-            type="password"
-            formControlName="confirmationMotDePasse"
-            placeholder="••••••••"
-            class="w-full px-4 py-2.5 rounded-xl border border-border bg-surface text-ink placeholder:text-ink-soft/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
-          />
-          @if (
-            form.errors?.['motsDePasseDifferents'] && form.controls.confirmationMotDePasse.touched
-          ) {
-            <p class="mt-1.5 text-xs text-danger">Les mots de passe ne correspondent pas</p>
-          }
-        </div>
-
-        <button
-          type="submit"
-          [disabled]="chargement()"
-          class="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-primary text-white font-medium text-sm hover:bg-primary-dark disabled:opacity-60 transition-colors mt-2"
-        >
-          @if (chargement()) {
-            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-              ></path>
-            </svg>
-            Création...
-          } @else {
-            Créer mon compte
-          }
-        </button>
+        }
       </form>
 
       <p class="mt-6 text-center text-sm text-ink-soft">

@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -18,6 +18,8 @@ function motsDePasseIdentiquesValidator(): ValidatorFn {
   };
 }
 
+type Etape = 1 | 2;
+
 @Component({
   selector: 'app-register',
   imports: [ReactiveFormsModule, RouterLink],
@@ -30,6 +32,7 @@ export class RegisterComponent {
 
   protected readonly chargement = signal(false);
   protected readonly erreur = signal<string | null>(null);
+  protected readonly etape = signal<Etape>(1);
 
   protected readonly form = this.fb.group(
     {
@@ -42,6 +45,30 @@ export class RegisterComponent {
     },
     { validators: motsDePasseIdentiquesValidator() },
   );
+
+  // Champs de l'étape 1, utilisés pour valider avant de passer à l'étape 2
+  private readonly champsEtape1 = ['nom', 'prenom', 'email', 'telephone'] as const;
+
+  protected readonly etape1Valide = computed(() => {
+    // Signal factice pour forcer la réévaluation — voir (input) dans le template
+    return this.champsEtape1.every((champ) => this.form.controls[champ].valid);
+  });
+
+  suivant(): void {
+    const etape1Ok = this.champsEtape1.every((champ) => {
+      const control = this.form.controls[champ];
+      control.markAsTouched();
+      return control.valid;
+    });
+
+    if (etape1Ok) {
+      this.etape.set(2);
+    }
+  }
+
+  precedent(): void {
+    this.etape.set(1);
+  }
 
   soumettre(): void {
     if (this.form.invalid) {

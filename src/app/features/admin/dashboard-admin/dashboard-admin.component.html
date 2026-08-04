@@ -17,28 +17,54 @@
     <!-- Cartes de statistiques (KPIs) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
       <!-- Utilisateurs actifs -->
-      <div class="bg-surface rounded-2xl border border-border p-6 flex items-center gap-4">
-        <div
-          class="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center shrink-0"
-        >
-          <svg lucideUsers class="w-6 h-6 text-primary-dark"></svg>
+      <div
+        class="group relative bg-surface rounded-2xl border border-border p-6 overflow-hidden cursor-default transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/10"
+      >
+        <svg
+          lucideUsers
+          class="absolute -right-3 -bottom-3 w-24 h-24 text-primary/4 transition-all duration-500 ease-out group-hover:text-primary/[0.07] group-hover:scale-110 group-hover:-rotate-6"
+        ></svg>
+
+        <div class="relative flex items-start justify-between mb-5">
+          <div
+            class="w-12 h-12 rounded-xl bg-primary-light flex items-center justify-center transition-transform duration-300 ease-out group-hover:scale-110 group-hover:-rotate-3"
+          >
+            <svg lucideUsers class="w-6 h-6 text-primary-dark"></svg>
+          </div>
         </div>
-        <div>
-          <p class="text-sm text-ink-soft">Utilisateurs actifs</p>
-          <p class="text-2xl font-(--font-display) text-ink mt-1">
+
+        <div class="relative">
+          <p class="text-sm text-ink-soft mb-1.5">Utilisateurs actifs</p>
+          <p
+            class="text-3xl font-(--font-display) text-ink tabular-nums transition-transform duration-300 ease-out group-hover:translate-x-0.5"
+          >
             {{ s.nombreUtilisateursActifs }}
           </p>
         </div>
       </div>
 
       <!-- Volume financier -->
-      <div class="bg-surface rounded-2xl border border-border p-6 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-xl bg-accent-light flex items-center justify-center shrink-0">
-          <svg lucideWallet class="w-6 h-6 text-accent"></svg>
+      <div
+        class="group relative bg-surface rounded-2xl border border-border p-6 overflow-hidden cursor-default transition-all duration-300 ease-out hover:-translate-y-1 hover:border-accent/30 hover:shadow-lg hover:shadow-accent/10"
+      >
+        <svg
+          lucideWallet
+          class="absolute -right-3 -bottom-3 w-24 h-24 text-accent/5 transition-all duration-500 ease-out group-hover:text-accent/8 group-hover:scale-110 group-hover:-rotate-6"
+        ></svg>
+
+        <div class="relative flex items-start justify-between mb-5">
+          <div
+            class="w-12 h-12 rounded-xl bg-accent-light flex items-center justify-center transition-transform duration-300 ease-out group-hover:scale-110 group-hover:-rotate-3"
+          >
+            <svg lucideWallet class="w-6 h-6 text-accent"></svg>
+          </div>
         </div>
-        <div>
-          <p class="text-sm text-ink-soft">Volume total échangé</p>
-          <p class="text-2xl font-(--font-display) text-ink mt-1 tabular-nums">
+
+        <div class="relative">
+          <p class="text-sm text-ink-soft mb-1.5">Volume total échangé</p>
+          <p
+            class="text-3xl font-(--font-display) text-ink tabular-nums transition-transform duration-300 ease-out group-hover:translate-x-0.5"
+          >
             {{ s.volumeFinancierTotal | fcfa }}
             <span class="text-sm text-ink-soft font-sans font-normal">FCFA</span>
           </p>
@@ -46,13 +72,35 @@
       </div>
 
       <!-- Prêts en retard -->
-      <div class="bg-surface rounded-2xl border border-border p-6 flex items-center gap-4">
-        <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
-          <svg lucideAlertTriangle class="w-6 h-6 text-danger"></svg>
+      <div
+        class="group relative bg-surface rounded-2xl border border-border p-6 overflow-hidden cursor-default transition-all duration-300 ease-out hover:-translate-y-1 hover:border-danger/30 hover:shadow-lg hover:shadow-danger/10"
+      >
+        <svg
+          lucideAlertTriangle
+          class="absolute -right-3 -bottom-3 w-24 h-24 text-danger/5 transition-all duration-500 ease-out group-hover:text-danger/8 group-hover:scale-110 group-hover:-rotate-6"
+        ></svg>
+
+        <div class="relative flex items-start justify-between mb-5">
+          <div
+            class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center transition-transform duration-300 ease-out group-hover:scale-110 group-hover:rotate-3"
+          >
+            <svg lucideAlertTriangle class="w-6 h-6 text-danger"></svg>
+          </div>
+          @if (s.nombrePretsEnRetard > 0) {
+            <span
+              class="flex items-center gap-1 px-2 py-1 rounded-full bg-red-50 text-danger text-[11px] font-medium transition-transform duration-300 ease-out group-hover:scale-105"
+            >
+              <span class="w-1.5 h-1.5 rounded-full bg-danger animate-pulse"></span>
+              À traiter
+            </span>
+          }
         </div>
-        <div>
-          <p class="text-sm text-ink-soft">Prêts en retard</p>
-          <p class="text-2xl font-(--font-display) text-ink mt-1">
+
+        <div class="relative">
+          <p class="text-sm text-ink-soft mb-1.5">Prêts en retard</p>
+          <p
+            class="text-3xl font-(--font-display) text-ink tabular-nums transition-transform duration-300 ease-out group-hover:translate-x-0.5"
+          >
             {{ s.nombrePretsEnRetard }}
           </p>
         </div>
