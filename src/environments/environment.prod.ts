@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://ton-domaine-de-prod.com/api'
+  apiUrl: 'https://wallet-backend-iu6p.onrender.com/api'
 };
