@@ -108,11 +108,13 @@ export const routes: Routes = [
   },
 
   //   // --- Erreurs ---
-  //   {
-  //     path: 'acces-refuse',
-  //     loadComponent: () =>
-  //       import('./shared/components/acces-refuse/acces-refuse.component').then(m => m.AccesRefuseComponent)
-  //   },
+  {
+    path: 'acces-refuse',
+    loadComponent: () =>
+      import('./shared/components/acces-refuse/acces-refuse.component').then(
+        (m) => m.AccesRefuseComponent,
+      ),
+  },
   {
     path: '**',
     redirectTo: 'login',
